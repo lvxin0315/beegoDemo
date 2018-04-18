@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>接收页面</title>
+    <style>
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body, ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            color: #4d4d4d;
+            font: 14px/1.4em 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background: #f5f5f5 url('/static/vue/images/bg.jpg') no-repeat center;
+            background-size: cover;
+            font-smoothing: antialiased;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        #chat {
+            margin: 20px auto;
+            width: 800px;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+<audio id="audio" autoplay="autoplay">
+</audio>
+<div id="chat"></div>
+<script src="/static/vue/vue.js"></script>
+<script src="/static/vue/main.js"></script>
+<script src="/static/js/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    var zqfdata;
+    var receiver_socket = new WebSocket("ws://" + document.domain + ":{{.WsPort}}/chat");
+    var image = document.getElementById('receiver');
+    var audio = document.querySelector('audio');
+    window.initPlayer = function (obj) {
+        obj.playlist = []; //播放列表
+        obj.position = 0; //当前播放位置
+        //播放音乐(循环播放)
+        obj.start = function () {
+            if (jQuery.isArray(obj.playlist) && obj.playlist.length >= 1) {
+                $(obj).attr("src", obj.playlist[obj.position % obj.playlist.length]);
+                obj.play();
+            }
+        };
+        //播放一个列表
+        obj.playList = function (arr) {
+            if (jQuery.isArray(arr) && arr.length >= 1) {
+                obj.playlist = arr;
+                obj.position = 0;
+                obj.start();
+            }
+        };
+        //播放下一首
+        $(obj).on("ended", function (e) {
+            obj.playlist.shift();
+            obj.start();
+        });
+    };
+    initPlayer(audio);
+    receiver_socket.onmessage = function (data) {
+        zqfdata = jQuery.parseJSON(data.data);
+        console.log(zqfdata)
+        if (zqfdata.Mtype == 'video') {
+            image.src = zqfdata.Data;
+        } else if (zqfdata.Mtype == 'mess') {
+            $('#zystmp').text(zqfdata.Data);
+            $('#livegotmp').attr('src', zqfdata.Img);
+            $('#zystmp').trigger('click');
+        } else if (zqfdata.Mtype == 'mic') {
+            audio.playlist.push(zqfdata.Data);
+            if (audio.paused) {
+                audio.start();
+            }
+        } else if (zqfdata.Mtype == 'self') {
+            $('#livegotmpself').attr('src', zqfdata.Img);
+            $('#livegoself').attr('src', zqfdata.Img);
+        }
+    };
+    receiver_socket.onopen = function (event) {
+        receiver_socket.send(JSON.stringify({Data: "亲！我连上啦！", Mtype: "mess", Img: ''}));
+    };
+    receiver_socket.onclose = function (event) {
+        console.log('Client notified socket has closed', event);
+    };
+
+    function senddata(data) {
+        receiver_socket.send(JSON.stringify({Data: data, Mtype: "mess", Img: ''}));
+    }
+</script>
+</body>
+</html>
