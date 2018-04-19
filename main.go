@@ -4,6 +4,7 @@ import (
 	_ "beegoDemo/routers"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
+	"github.com/astaxie/beego/logs"
 )
 
 func main() {
@@ -16,6 +17,8 @@ func main() {
 		AllowCredentials: true,
 	})
 	beego.InsertFilter("*", beego.BeforeRouter, filter)
+	//日志级别
+	logs.SetLevel(logs.LevelError)
 	beego.Run()
 }
 
