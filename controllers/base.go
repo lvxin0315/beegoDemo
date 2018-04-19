@@ -30,11 +30,18 @@ type BaseController struct {
 func (c *BaseController)GetUsername(w http.ResponseWriter, r *http.Request) string {
 	sess, _ := globalSessions.SessionStart(w, r)
 	defer sess.SessionRelease(w)
-	return sess.Get("username").(string)
+	username := sess.Get("username")
+	if username == nil {
+		return "小程序"
+	}
+	return username.(string)
 }
 
 func (c *BaseController)SetUsername(w http.ResponseWriter, r *http.Request,username string)  {
 	sess, _ := globalSessions.SessionStart(w, r)
 	defer sess.SessionRelease(w)
+	if username == "" {
+		username = "小程序"
+	}
 	sess.Set("username",username)
 }
