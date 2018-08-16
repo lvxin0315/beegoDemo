@@ -18,7 +18,12 @@ func main() {
 	})
 	beego.InsertFilter("*", beego.BeforeRouter, filter)
 	//日志级别
-	logs.SetLevel(logs.LevelError)
+	logs.SetLevel(logs.LevelDebug)
+	//自动生成swagger文档
+	if beego.BConfig.RunMode == "dev" {
+		beego.BConfig.WebConfig.DirectoryIndex = true
+		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
+	}
 	beego.Run()
 }
 
