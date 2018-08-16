@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"beegoDemo/models"
 )
 
 type DemoRestController struct {
@@ -14,7 +15,11 @@ type DemoRestController struct {
 // @Success 200 {object} models.ZDTCustomer.Customer
 // @router /rest [get]
 func (c *DemoRestController)GetOne() {
-	c.Data["json"] = "Get"
+	op := models.Output{
+		Email:"ssssss@ssss.com",
+		Password: "123123",
+	}
+	c.Data["json"] = op
 	//c.Data["Key"] = key
 	c.ServeJSON()
 }
