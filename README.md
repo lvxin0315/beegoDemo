@@ -13,3 +13,9 @@ go run main.go 编译并启动
 dep 包管理工具
 
 bee beego框架出的创建、热编译、开发等功能工具
+
+bee run -gendoc=true -downdoc=true
+
+-gendoc=true 生成api文档
+
+-downdoc=true 加载swagger静态资源内容
