@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/astaxie/beego/logs"
+	"beegoDemo/background"
 )
 
 func main() {
@@ -24,6 +25,8 @@ func main() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
+	//定时器
+	background.Run()
 	beego.Run()
 }
 
